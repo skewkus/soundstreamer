@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sound Streamer · Remote</title>
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/admin.css">
+  <script src="/admin.js?v={{APP_VERSION}}" defer></script>
+  <script src="/theme.js" defer></script>
+  <link rel="icon" type="image/png" href="/icon.png?v={{APP_VERSION}}">
+</head>
+<body>
+  <main class="admin-main">
+    <header><span class="brand">Sound Streamer</span><span id="connection" class="tag">Home broadcast</span></header>
+    <section id="login" class="player admin-only">
+      <p class="eyebrow">YOUR HOUSE. YOUR MUSIC.</p><h1 id="login-title">Admin</h1>
+      <p id="login-hint" class="hint">Enter your admin password.</p>
+      <form id="login-form"><label for="password">Admin password</label><input id="password" type="password" autocomplete="current-password" required><div id="setup-confirm-wrap" hidden><label for="setup-confirm">Confirm password</label><input id="setup-confirm" type="password" autocomplete="new-password"></div><button id="login-submit" type="submit">Sign in</button></form>
+      <p id="login-error" role="alert"></p>
+    </section>
+    <div id="remote" hidden>
+      <div class="section-heading freeze-bar"><p id="frozen-banner" class="frozen-banner" hidden>Controls are frozen by admin. Playback continues.</p><button id="freeze" class="quiet admin-only">Freeze controls</button></div>
+      <section class="now-card">
+        <div class="now-top"><span id="playback-state" class="eyebrow">READY</span><span id="media-kind" class="tag">Station</span></div>
+        <h1 id="now-title">Choose something to play</h1><p id="now-artist" class="hint">Browse your library below.</p>
+        <label class="sr-only" for="seek">Playback position</label><input id="seek" type="range" min="0" max="1" step="0.1" value="0" disabled>
+        <div class="time-row"><span id="elapsed">0:00</span><span id="duration">0:00</span></div>
+        <div class="transport"><button id="play-pause" class="primary">Play</button><button id="next">Next</button><button id="stop" class="quiet">Stop</button></div>
+        <!-- admin-capture:start -->
+        <button id="pc-audio" class="quiet pc-audio-button" hidden>Stream PC audio</button><button id="pc-screen" class="quiet pc-audio-button" hidden>Stream PC screen + audio</button><p id="pc-audio-hint" class="hint" hidden>Shares the server PC’s default sound output. Keep this PC’s listening page muted to avoid capturing its own delayed playback. Stop capture or select a library item to return to files.</p>
+        <!-- admin-capture:end -->
+        <p id="preparing" class="hint" hidden></p>
+      </section>
+      <nav class="tabs" aria-label="Remote sections">
+        <button data-tab="library" aria-selected="true">Library</button><button data-tab="queue" aria-selected="false">Queue <span id="queue-count">0</span></button><button data-tab="rooms" aria-selected="false">Rooms</button><button class="admin-only" data-tab="settings" aria-selected="false">Settings</button>
+      </nav>
+      <section id="panel-library" class="panel">
+        <div class="library-switch" role="group" aria-label="Library type"><button data-kind="audio" aria-pressed="true">Music</button><button data-kind="video" aria-pressed="false">Video</button></div><div class="search-row"><label class="sr-only" for="search">Search media</label><input id="search" type="search" placeholder="Search songs, artists, albums, videos…"><label class="sr-only" for="kind">Media type</label><select id="kind" hidden><option value="audio">Music</option><option value="video">Video</option></select></div>
+        <label class="sr-only" for="category-filter">Category</label><select id="category-filter"><option value="">All</option></select>
+        <p id="library-status" class="hint"></p><div id="library-list" class="list"></div><button id="more" class="quiet" hidden>Show more</button>
+      </section>
+      <section id="panel-queue" class="panel" hidden>
+        <div class="section-heading"><h2>Up next</h2><button id="clear-queue" class="quiet">Clear queue</button></div>
+        <div class="options"><label><input id="shuffle" type="checkbox"> Shuffle</label><label for="repeat">Repeat</label><select id="repeat"><option value="none">Off</option><option value="one">Current track</option><option value="all">Entire queue</option></select></div>
+        <div id="queue-list" class="list"></div>
+        <div class="section-heading"><h2>Playlists</h2><button id="save-playlist" class="quiet">Save playlist</button></div>
+        <label class="sr-only" for="playlists">Saved playlists</label><select id="playlists"><option value="">Choose a playlist</option></select>
+        <div class="playlist-actions"><button id="add-playlist" class="quiet">Add to queue</button><button id="delete-playlist" class="quiet">Delete playlist</button></div>
+      </section>
+      <section id="panel-rooms" class="panel" hidden>
+        <h2>Connected rooms</h2><p class="hint">Name each room on its listening or watching page. Muting keeps it on the live timeline.</p><div id="room-list" class="list"></div>
+        <div class="portal-links"><a href="/stream" target="_blank" rel="noopener">Open stream ↗</a></div>
+      </section>
+      <section id="panel-settings" class="panel admin-only" hidden>
+        <h2>Sources</h2><p class="hint">Choose folders on the server. Folders include only their own files by default. Enable Include subfolders to scan the whole folder tree.</p>
+        <div class="source"><strong>Music folders</strong><div id="music-folders" class="list"></div><button data-source="music" class="quiet">Add folder</button></div>
+        <div class="source"><strong>Video folders</strong><div id="video-folders" class="list"></div><button data-source="video" class="quiet">Add folder</button></div>
+        <button id="rescan" class="quiet">Rescan all</button><p id="scan-status" class="hint"></p>
+        <h2>Categories</h2><p class="hint">Every folder needs a category. Reassign its folders before deleting a category.</p>
+        <h3>Music categories</h3><div id="music-categories" class="list"></div><form id="add-music-category" class="category-form"><label class="sr-only" for="new-music-category">New music category</label><input id="new-music-category" placeholder="e.g. Albums" maxlength="80" required><button class="quiet" type="submit">Add category</button></form>
+        <h3>Video categories</h3><div id="video-categories" class="list"></div><form id="add-video-category" class="category-form"><label class="sr-only" for="new-video-category">New video category</label><input id="new-video-category" placeholder="New video category" maxlength="80" required><button class="quiet" type="submit">Add category</button></form>
+        <h2>Server</h2>
+        <form id="port-form" class="password-form">
+          <label for="listen-port">Listening port (HTTP or HTTPS)</label><input id="listen-port" type="number" min="1" max="65535" step="1" required value="8080">
+          <label><input id="https-enabled" type="checkbox"> Enable HTTPS</label>
+          <label for="https-hostname">HTTPS hostname for tray links</label><input id="https-hostname" type="text" placeholder="streamer.example.com" autocomplete="off" spellcheck="false"><p class="hint">Hostname only, without https://, a port or a path. It must match your certificate and resolve to this PC. Leave blank to use the local address. Applies after restart.</p>
+          <label for="cert-file">Certificate file path on the server</label><input id="cert-file" type="text" placeholder="C:\Certificates\fullchain.crt" autocomplete="off" spellcheck="false">
+          <label for="key-file">Private key file path on the server</label><input id="key-file" type="text" placeholder="C:\Certificates\private.key" autocomplete="off" spellcheck="false">
+          <button type="submit" class="quiet">Save server settings</button>
+        </form>
+        <p id="port-status" class="hint"></p><p class="hint">Server changes apply after exiting and restarting Sound Streamer. HTTPS replaces HTTP on the listening port. Use PEM certificate/chain and matching unencrypted private key files. Relative paths start beside soundstreamer.json. Connect using a hostname covered by your certificate, and update the saved URLs on room devices.</p>
+        <h2>Audio quality</h2>
+        <form id="audio-settings-form" class="password-form">
+          <label for="audio-channels">Output channels</label><select id="audio-channels"><option value="2" selected>Stereo (default)</option><option value="1">Mono</option></select>
+          <label for="audio-sample-rate">Sample rate</label><select id="audio-sample-rate"><option value="48000" selected>48 kHz (default)</option><option value="44100">44.1 kHz</option><option value="32000">32 kHz</option><option value="24000">24 kHz</option></select>
+          <button type="submit" class="quiet">Save audio settings</button>
+        </form>
+        <p id="audio-settings-status" class="hint"></p><p class="hint">Applies to every room after exiting and restarting Sound Streamer, including file playback and PC capture. Audio remains 16-bit. Stereo preserves left/right channels; mono downmixes them. Lower sample rates reduce bandwidth and high-frequency detail but do not reduce the shared buffer or necessarily fix lag.</p>
+        <h2>Video playback</h2>
+        <form id="video-transcode-form" class="password-form">
+          <label class="check-row"><input id="force-video-transcode" type="checkbox"> Force transcoding</label>
+          <label for="video-transcode-resolution">Maximum resolution</label><select id="video-transcode-resolution"><option value="original">Original</option><option value="1080p">1080p</option><option value="720p" selected>720p</option><option value="480p">480p</option></select>
+          <button type="submit" class="quiet">Apply video settings</button>
+        </form>
+        <p class="hint">Automatic transcoding for unsupported videos always remains enabled. Force transcoding also converts compatible videos, using the selected resolution and bitrate limit for every room. Smaller videos are not enlarged. Applying changes briefly re-buffers a playing video at its current position; paused videos use the settings when resumed. Music and PC screen capture are unaffected.</p>
+        <h2>Library titles</h2><label for="title-source">Title source</label><select id="title-source"><option value="filename">Filename (without extension)</option><option value="metadata">Embedded metadata</option></select><p class="hint">Applies immediately to music and video titles in the library, queue, and stream. No rescan needed.</p>
+        <h2>Appearance</h2><label for="theme">Theme</label><select id="theme"><option value="green">Green</option><option value="blue">Blue</option><option value="red">Red</option><option value="purple">Purple</option><option value="amber">Amber</option><option value="teal">Teal</option></select>
+        <h2>PC screen streaming</h2><label for="screen-fps">Frame rate</label><select id="screen-fps"><option value="30">30 FPS</option><option value="60">60 FPS</option></select><p class="hint">Primary monitor at 720p. Frame rate changes apply the next time you start screen streaming.</p>
+        <form id="screen-audio-offset-form" class="password-form"><label for="screen-audio-offset">Screen stream audio offset (milliseconds)</label><input id="screen-audio-offset" type="number" min="-3000" max="3000" step="10" value="0" required><div class="playlist-actions"><button type="submit" class="quiet">Apply offset</button><button id="screen-audio-offset-reset" type="button" class="quiet">Reset to 0</button></div></form><p class="hint">Sound late? Use a negative value to make it earlier. Sound early? Use a positive value to delay it. Applies to PC screen + audio in every room, saves automatically, and works while streaming. Larger advances may add overall playback delay.</p>
+        <h2>Playback settings</h2><label for="volume">Broadcast volume <span id="volume-value">100%</span></label><input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+        <label class="check-row"><input id="resume" type="checkbox"> Resume playback when the server starts</label>
+        <p class="hint">Room devices retain their own volume controls. Your library sources, queue, playlists, room settings, and playback position save automatically.</p>
+        <h2>Admin password</h2><form id="password-form" class="password-form"><label for="current-password">Current password</label><input id="current-password" type="password" autocomplete="current-password" required><label for="new-password">New password</label><input id="new-password" type="password" autocomplete="new-password" minlength="8" required><label for="confirm-password">Confirm new password</label><input id="confirm-password" type="password" autocomplete="new-password" minlength="8" required><button type="submit" class="quiet">Change password</button></form>
+        <button id="logout" class="quiet">Sign out</button>
+      </section>
+    </div>
+    <p id="notice" role="status" aria-live="polite" hidden></p>
+    <dialog id="folder-dialog">
+      <div class="section-heading"><h2 id="folder-title">Select a folder</h2><button id="folder-close" class="quiet">Close</button></div>
+      <p class="hint">Browse the server's drives, or enter a folder path.</p><form id="folder-path-form"><label class="sr-only" for="folder-path">Server folder path</label><input id="folder-path" placeholder="Folder path"><button class="quiet" type="submit">Go</button></form>
+      <label for="folder-category">Category (required)</label><select id="folder-category" required></select>
+      <label class="check-row"><input id="folder-recursive" type="checkbox"> Include subfolders</label>
+      <div class="folder-navigation"><button id="folder-roots" class="quiet">Drives / roots</button><button id="folder-up" class="quiet">Up a folder</button></div>
+      <div id="folder-list" class="list"></div><button id="folder-select" class="primary" disabled>Use this folder</button>
+    </dialog>
+    <footer class="app-version">Sound Streamer v{{APP_VERSION}} · <a class="license-link" href="/license" target="_blank" rel="noopener">MIT License</a></footer>
+  </main>
+</body>
+</html>
