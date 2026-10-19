@@ -1,0 +1,33 @@
+# Local development environment and private material
+/.agents/
+/.aws/
+/.codex/
+/Cert Example/
+/Previous chat.txt
+*.key
+*.pem
+*.pfx
+*.p12
+*.p8
+*.jks
+*.keystore
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# Local application state, including when running directly from bin/
+**/soundstreamer.json
+**/soundstreamer-library.json
+**/soundstreamer-cache/
+**/soundstreamer.log
+**/soundstreamer.log.1
+**/.soundstreamer-*.tmp
+
+# Temporary builds and diagnostics; versioned release EXEs in bin/ are kept
+/soundstreamer
+/soundstreamer-main
+/soundstreamer*.exe
+/soundstreamer*.zip
+*.test
+/winres/.soundstreamer-winres-*.json

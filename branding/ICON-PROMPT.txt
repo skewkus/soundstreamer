@@ -1,0 +1,7 @@
+Generated with the built-in image_gen tool.
+
+Final prompt:
+Use case: logo-brand. Asset type: Windows application icon and system tray icon for Sound Streamer, a home multi-room audio/video broadcast app. Create a single polished square app icon: a deep midnight navy rounded-square tile containing one bold mint-green play triangle seamlessly paired with three thick sound-wave bars, conveying synchronized playback and broadcasting. Modern, confident, minimal geometric design with a subtle teal-to-mint gradient in the mark; strong silhouette readable at 16 pixels. Centered large mark, generous but compact padding. Front-facing flat app icon, crisp edges. Transparent outside the rounded tile. No text, letters, small decorative details, mockup, shadow outside the tile, or watermark.
+
+Source: sound-streamer.png. Windows multi-size export: sound-streamer.ico.
+The resource compiler generates the EXE/tray icon sizes from the PNG.

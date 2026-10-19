@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sound Streamer · Stream</title>
+  <link rel="stylesheet" href="/style.css?v={{APP_VERSION}}">
+  <link rel="stylesheet" href="/video.css">
+  <script src="/app.js?v={{APP_VERSION}}" defer></script>
+  <script src="/transcode.js" defer></script>
+  <script src="/desktop.js" defer></script>
+  <script src="/video.js" defer></script>
+  <script src="/theme.js" defer></script>
+  <link rel="icon" type="image/png" href="/icon.png?v={{APP_VERSION}}">
+</head>
+<body>
+  <main>
+    <header class="stream-header"><span class="brand">Sound Streamer</span><nav class="stream-navigation" aria-label="Stream navigation"><span class="tag">Live stream</span><a class="control-link" href="/control">Control</a></nav></header>
+    <section class="player">
+      <p class="eyebrow">ONE BROADCAST. EVERY ROOM.</p>
+      <p id="artist" class="artist-line"></p>
+      <h1 id="title">Connecting to your station…</h1>
+      <div id="screen" class="screen" hidden>
+        <video id="video" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback aria-label="Live broadcast video"></video>
+        <div id="audio-picture" class="audio-picture-card"><p id="fullscreen-artist" class="artist-line"></p><h1 id="fullscreen-title"></h1></div>
+        <button id="fullscreen" type="button">Fullscreen</button>
+      </div>
+      <div class="status"><span id="light"></span><span id="status" role="status" aria-live="polite">Ready to join</span></div>
+      <button id="join">Join stream</button>
+      <p id="picture-status" class="hint" role="status"></p>
+    </section>
+    <section class="diagnostics" aria-label="Connection diagnostics">
+      <div><span>Connected rooms</span><strong id="rooms">—</strong></div>
+      <div><span>Clock round trip</span><strong id="rtt">—</strong></div>
+      <div><span>Audio queued</span><strong id="queued">—</strong></div>
+      <div><span>Audio correction</span><strong id="drift">—</strong></div>
+      <div><span>Late audio chunks</span><strong id="late">0</strong></div>
+      <div><span>Shared buffer</span><strong id="buffer">—</strong></div>
+      <div class="video-diagnostic"><span>Picture correction</span><strong id="video-drift">—</strong></div>
+      <div class="video-diagnostic"><span>Picture position</span><strong id="position">—</strong></div>
+      <div class="video-diagnostic"><span>Picture resyncs</span><strong id="resyncs">0</strong></div>
+    </section>
+    <details>
+      <summary>Name this room</summary>
+      <p id="room-label">Give this browser a name so you can identify it in admin.</p>
+      <label for="room-name">Room name</label><input id="room-name" type="text" maxlength="80" placeholder="Lounge TV"><button id="room-save" type="button">Save name</button>
+    </details>
+    <details>
+      <summary>Room timing calibration</summary>
+      <p>If this room sounds early, add a positive delay; use a negative value if it sounds late. Both picture and sound follow this adjustment.</p>
+      <label for="offset">Extra delay (milliseconds)</label>
+      <input id="offset" type="number" min="-300" max="300" step="1" value="0">
+    </details>
+    <footer><span id="mode">Video mode.</span> Picture timing figures are estimates. Compare devices side by side to judge actual alignment.<span class="app-version">Sound Streamer v{{APP_VERSION}} · <a class="license-link" href="/license" target="_blank" rel="noopener">MIT License</a></span></footer>
+  </main>
+</body>
+</html>
